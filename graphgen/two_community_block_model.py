@@ -60,14 +60,26 @@ def add_edges_to_graph(graph, com1_set, com2_set, num_edges_to_add):
         else:
             graph.add_edge(tail, head)
 
-def weighted_two_community_graph(N, mu, avg_degree, EE_W=30000.0):
+def uniform_weighted_two_community_graph(N, mu, avg_degree, lower_bound=0, upper_bound=1):
 
-    graph = generate_unweighted_two_community_graph(N, mu, avg_degree)
+    graph = unweighted_two_community_graph(N, mu, avg_degree)
+    weights = np.random.uniform(lower_bound, upper_bound, size=nx.number_of_edges(graph))
+    for i, edge in enumerate(graph.edges_iter()):
+        graph[edge[0]][edge[1]]['weight'] = weights[i]
+
+    return graph
+
+def gamma_weighted_two_community_graph(N, mu, avg_degree, EE_W=30000.0, negative_weights=False):
+
+    graph = unweighted_two_community_graph(N, mu, avg_degree)
 
     weights = random_gamma(EE_W, nx.number_of_edges(graph))
 
     for i, edge in enumerate(graph.edges_iter()):
-        graph[edge[0]][edge[1]]['weight'] = weights[i]
+        if rnd.random() < 0.5:
+            graph[edge[0]][edge[1]]['weight'] = weights[i]
+        else:
+            graph[edge[0]][edge[1]]['weight'] = -weights[i]
 
     return graph
 
