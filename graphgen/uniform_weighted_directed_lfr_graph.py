@@ -6,11 +6,11 @@ import numpy as np
 def uniform_weighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, weight_bounds, **kwargs):
     """
     """
-
-    multicommunityLFR_pardict = { key: value for key, value in kwargs.items() \
+    
+    pardict = { key: value for key, value in kwargs.items() \
         if key in inspect.getargspec(lfr.unweighted_directed_lfr_graph).args }
 
-    reservoir = lfr.unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, **multicommunityLFR_pardict)
+    reservoir = lfr.unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, **pardict)
     weights = np.random.uniform(weight_bounds[0], weight_bounds[1], size=nx.number_of_edges(reservoir))
     for i, edge in enumerate(reservoir.edges_iter()):
         reservoir[edge[0]][edge[1]]['weight'] = weights[i]
@@ -21,14 +21,14 @@ def uniform_weighted_directed_lfr_graph_asarray(**kwargs):
     """
     """
 
-    return np.asarray(nx.to_numpy_matrix(make_reservoir(**kwargs)))
+    return np.asarray(nx.to_numpy_matrix(uniform_weighted_directed_lfr_graph(**kwargs)))
 
 
 def uniform_weighted_directed_lfr_graph_asnx(**kwargs):
     """
     """
 
-    return make_reservoir(**kwargs)
+    return uniform_weighted_directed_lfr_graph(**kwargs)
 
 if __name__ == '__main__':
     
