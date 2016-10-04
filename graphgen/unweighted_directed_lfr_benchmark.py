@@ -77,23 +77,37 @@ def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0,
 
     if full_path != None:
         path = full_path
+        directory = path + "temp_" + str(temp_dir_ID) + "/"
+        params={'N':N, 'k':k, 'maxk':maxk, 'mu':mu, 't1':deg_exp, 't2':com_exp, 
+            'minc':minc, 'maxc':maxc, 'on':on, 'om':om, 'param_file':directory+'flags.dat'}
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        if benchmark_file != None:
+            command_file = path + benchmark_file
+        else:
+            command_file = path + "directed_benchmark"
+        shutil.copy(command_file, directory)
+        os.chdir(directory)
+
+        graph = generate_graph(params, command_file, directory)
+
     else:
         path = './'
+        directory = path + "temp_" + str(temp_dir_ID) + "/"
+        params={'N':N, 'k':k, 'maxk':maxk, 'mu':mu, 't1':deg_exp, 't2':com_exp, 
+            'minc':minc, 'maxc':maxc, 'on':on, 'om':om, 'param_file':path+'flags.dat'}
 
-    directory = path + "temp_" + str(temp_dir_ID) + "/"
-    params={'N':N, 'k':k, 'maxk':maxk, 'mu':mu, 't1':deg_exp, 't2':com_exp, 
-        'minc':minc, 'maxc':maxc, 'on':on, 'om':om, 'param_file':directory+'flags.dat'}
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        if benchmark_file != None:
+            command_file = path + benchmark_file
+        else:
+            command_file = path + "directed_benchmark"
+        shutil.copy(command_file, directory)
+        os.chdir(directory)
 
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    if benchmark_file != None:
-        command_file = path + benchmark_file
-    else:
-        command_file = path + "directed_benchmark"
-    shutil.copy(command_file, directory)
-    os.chdir(directory)
-
-    graph = generate_graph(params, command_file, directory)
+        graph = generate_graph(params, command_file, path)
 
     # move back
     if full_path:
