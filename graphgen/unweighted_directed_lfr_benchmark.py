@@ -119,6 +119,10 @@ def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0,
 
     return graph
 
+def unweighted_directed_lfr_graph_asarray(**kwargs):
+
+    return np.asarray(nx.to_numpy_matrix(unweighted_directed_lfr_graph(**kwargs)))
+
 if __name__ == '__main__':
     """
     """
