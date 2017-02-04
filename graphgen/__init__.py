@@ -5,3 +5,5 @@ from .uniform_weighted_directed_lfr_graph import uniform_weighted_directed_lfr_g
 from .two_community_block_model import gamma_weighted_two_community_graph
 from .two_community_block_model import uniform_weighted_two_community_graph
 from .two_community_block_model import unweighted_two_community_graph
+from .unweighted_directed_hmn import unweighted_directed_hmn
+from .unweighted_directed_hmn import unweighted_directed_hmn_as_asrray
