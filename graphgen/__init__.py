@@ -7,3 +7,5 @@ from .two_community_block_model import uniform_weighted_two_community_graph
 from .two_community_block_model import unweighted_two_community_graph
 from .unweighted_directed_hmn import unweighted_directed_hmn
 from .unweighted_directed_hmn import unweighted_directed_hmn_as_asrray
+from .stochastic_block_model import weighted_directed_stochastic_block_model
+from .stochastic_block_model import weighted_directed_stochastic_block_model_asarray

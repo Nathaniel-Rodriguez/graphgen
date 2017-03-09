@@ -3,12 +3,14 @@ import numpy as np
 import random
 import itertools
 
-def random_product_without_replacement(*args, size=1):
+def random_product_without_replacement(*args, **kwargs):
     """
     Pulls random products of multiple lists without replacement.
     Works well for sparse calls that are many times less than
     the total number of combinations.
     """
+
+    size = kwargs.get('size', 1)
     used = set()
     pools = list(map(tuple, args))
     
@@ -129,7 +131,7 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
     attachment_probability, connectivity_scaling):
     """
     Builds a hierarchical modular network using the aglorithm from:
-    Moretti, P., & Muñoz, M. A. (2013). Griffiths phases and the stretching of criticality in brain networks. 
+    Moretti, P., & Munoz, M. A. (2013). Griffiths phases and the stretching of criticality in brain networks. 
     Nature Communications, 4, 2521. https://doi.org/10.1038/ncomms3521
 
     Uses networkx and makes directed graphs.
@@ -168,9 +170,7 @@ if __name__ == '__main__':
     print(N)
 
     # Generate initial node set
-    graph = nx.DiGraph()
-    graph.add_nodes_from(range(N))
-
+    graph = unweighted_directed_hmn(s, b, M_o, p, alpha)
     print(nx.info(graph))
 
     nx.write_gexf(graph,"test.gexf")

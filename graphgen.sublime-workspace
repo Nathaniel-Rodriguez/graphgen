@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"num",
+				"num_of_levels"
+			],
+			[
+				"ke",
+				"keyLevel_valMembershipDict"
+			],
+			[
+				"mem",
+				"membership"
+			],
+			[
 				"nu",
 				"num_of_jobs"
 			],
@@ -70,10 +82,6 @@
 			[
 				"mu",
 				"mu_effective"
-			],
-			[
-				"num",
-				"num_of_parents"
 			],
 			[
 				"scal",
@@ -506,24 +514,34 @@
 			[
 				"siml",
 				"simulate_random_walk"
-			],
-			[
-				"noise",
-				"noise_threshold"
-			],
-			[
-				"nois",
-				"noise_threshold"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": ".gitignore",
+			"file": "graphgen/unweighted_directed_hmn.py",
 			"settings":
 			{
-				"buffer_size": 200,
+				"buffer_size": 7023,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "graphgen/stochastic_block_model.py",
+			"settings":
+			{
+				"buffer_size": 9959,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "graphgen/__init__.py",
+			"settings":
+			{
+				"buffer_size": 696,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -582,10 +600,12 @@
 	},
 	"expanded_folders":
 	[
-		"/home/nathaniel/workspace/research_packages/graphgen"
+		"/home/nathaniel/workspace/research_packages/graphgen",
+		"/home/nathaniel/workspace/research_packages/graphgen/graphgen"
 	],
 	"file_history":
 	[
+		"/home/nathaniel/workspace/research_packages/graphgen/.gitignore",
 		"/home/nathaniel/workspace/research_packages/graphgen/graphgen/two_community_block_model.py",
 		"/home/nathaniel/workspace/resources/deap_cma.py",
 		"/home/nathaniel/workspace/research_packages/cma-es/cma-es/cma-es.py",
@@ -758,35 +778,99 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": ".gitignore",
+					"file": "graphgen/unweighted_directed_hmn.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 200,
+						"buffer_size": 7023,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								200,
-								200
+								5672,
+								5672
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 158.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "graphgen/stochastic_block_model.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9959,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8737,
+								8737
+							]
+						],
+						"settings":
+						{
+							"rulers":
+							[
+								78
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1620.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "graphgen/__init__.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 696,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								696,
+								696
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -869,7 +953,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 194.0,
+	"side_bar_width": 306.0,
 	"status_bar_visible": false,
 	"template_settings":
 	{
