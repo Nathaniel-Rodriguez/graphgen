@@ -9,4 +9,4 @@
 /*.egg
 
 # Remove sublime projects
-*.sublime-project
+*.sublime*
