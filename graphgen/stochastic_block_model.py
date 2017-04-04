@@ -7,7 +7,7 @@ import networkx as nx
 import scipy.stats as stats
 from itertools import product
 
-def generate_degree_distribution(N, distribution_type, distribution_args=()):
+def generate_discrete_distribution(N, distribution_type, distribution_args=()):
     """
     Generates a sequence of distrete random variables for the 
     degree distribution given the parameters for the distribution
@@ -30,7 +30,7 @@ def generate_degree_distribution(N, distribution_type, distribution_args=()):
     elif distribution_type == 'powerlaw' or distribution_type == 'zipf':
         return stats.zipf(*distribution_args).rvs(size=N)
 
-def generate_weight_distribution(E, distribution_type, distribution_args=(), 
+def generate_continuous_distribution(E, distribution_type, distribution_args=(), 
     sign_flip_fraction=0.0):
     """
     Generates a sequence of continuous weights for each edge.
@@ -82,14 +82,14 @@ def calculate_expected_degrees(group_sizes,
 
     num_groups = len(group_sizes)
     expected_node_indegrees_by_group = \
-        [ generate_degree_distribution(group_sizes[group], 
+        [ generate_discrete_distribution(group_sizes[group], 
             degree_distribution, degree_distribution_parameter_vector[group]) 
         for group in range(num_groups) ]
 
     if not correlated_inout_degree:
 
         expected_node_outdegrees_by_group = \
-        [ generate_degree_distribution(group_sizes[group], 
+        [ generate_discrete_distribution(group_sizes[group], 
             degree_distribution, degree_distribution_parameter_vector[group]) 
         for group in range(num_groups) ]
     else:
@@ -124,12 +124,28 @@ def add_connection_weights(graph, edges, distribution_args,
     distribution_type, flip_fraction):
 
     if len(edges) != 0:
-        weights = generate_weight_distribution(len(edges), 
+        weights = generate_continuous_distribution(len(edges), 
                                                 distribution_type, 
                                                 distribution_args, 
                                                 flip_fraction)
         nx.set_edge_attributes(graph, 'weight', { tuple(edges[i]) : weights[i] 
                                                 for i in range(len(edges)) })
+
+def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict):
+
+    if edge_attribute_dict['distribution_type'] == 'discrete':
+        rvs_generator = self.generate_discrete_distribution
+    if edge_attribute_dict['distribution_type'] == 'continuous':
+        rvs_generator = self.generate_continuous_distribution
+
+    for bundle, edges in edge_bundles_by_group.items():
+        if len(edges) != 0:
+            rvs = rvs_generator(len(edges), 
+                    edge_attribute_dict['distribution'],
+                    edge_attribute_dict['distribution_param_matrix']\
+                                        [bundle[0], bundle[1]])
+            nx.set_edge_attributes(graph, edge_attribute_dict['key'],
+                {tuple(edges[i]) : rvs[i] for i in range(len(edges))})
 
 def remove_self_loops(graph):
 
@@ -143,13 +159,14 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
     degree_distribution_parameter_vector,
     negative_weight_fraction_matrix=None,
     weight_distribution="gamma", degree_distribution="poisson", 
-    correlated_inout_degree=True, self_loops=False):
+    correlated_inout_degree=True, self_loops=False,
+    other_edge_block_attributes=[]):
     """
     N - number of nodes in the graph
     relative_group_sizes - sequence with magnitudes (will be normalized internally)
     connectivity_block_matrix - matrix, elements are connection probabilities 
                                     (i,j element is from group-j to group-i)
-    degree_distribution_parameter_vector - degree distribution parameters 
+    degree_distribution_parameter_vecdegree_distribution="poisson"tor - degree distribution parameters 
                                             (tuple or seq) for each group
     weight_distribution_parameter_matrix - weight distribution parameters 
                                     (tuple of seq) for each edge bundle (i,j)
@@ -172,6 +189,17 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
     Finally weight distribution parameters are used to draw weights from the
     desired class of distributions: general normal (gennorm), uniform, 
     pareto, log-normal (lognorm), or gamma.
+
+    kwargs: currently supports additional edge attributes
+        other_edge_block_attributes: default []
+            requires a list of dictionarys with 
+            {'distribution_param_matrix', 'key', 
+            'distribution', 'distribution_type'}
+
+            distribution_param_matrix - params for each i.j bundle
+            key - key to be assigned to the edge attribute
+            distribution - name of distribution
+            distribution_type - continuous/discrete
 
     """
 
@@ -223,6 +251,11 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
             weight_distribution, negative_weight_fraction_matrix[bundle[0], 
                                                                 bundle[1]])
 
+    # Add other attributes
+    for edge_block_attributes in other_edge_block_attributes:
+        add_edge_attributes(graph, edge_bundles_by_group, 
+                            edge_block_attributes)
+
     if not self_loops:
         remove_self_loops(graph)
 
@@ -238,6 +271,15 @@ def weighted_directed_stochastic_block_model_asarray(**kwargs):
     return np.asarray(nx.to_numpy_matrix(\
                         weighted_directed_stochastic_block_model(**kwargs)))
 
+# def undirected_stochastic_block_model(N, relative_group_sizes,
+#     connectivity_block_matrix, degree_distribution_parameter_vector,
+#     self_loops=False, degree_distribution="poisson"):
+
+# def undirected_stochastic_block_model_asarray(**kwargs):
+
+#     return np.asarray(nx.to_numpy_matrix(\
+#                         undirected_stochastic_block_model(**kwargs)))
+
 if __name__ == '__main__':
     """
     testing
@@ -245,7 +287,7 @@ if __name__ == '__main__':
 
     import matplotlib.pyplot as plt
 
-    # plt.hist(generate_weight_distribution(1000, "lognorm", (1.0,1,1)))
+    # plt.hist(generate_continuous_distribution(1000, "lognorm", (1.0,1,1)))
     # plt.show()
 
     N=100

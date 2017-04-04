@@ -1,10 +1,10 @@
 import networkx as nx
 import os
-import subprocess
 import sys
 import shutil
 import numpy as np
 import utilities
+import subprocess
 
 def write_flagfile(network_params):
     """
@@ -68,7 +68,7 @@ def read_LFR_output(edge_file, community_file):
 
     return LFR_graph
 
-def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0, 
+def unweighted_undirected_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0, 
     com_exp=1.0, on=0, om=0, temp_dir_ID=0, full_path=None, benchmark_file=None):
     """
     Creates a temporary directory in which to generate an LFR graph, then removes the directory
@@ -86,7 +86,7 @@ def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0,
         if benchmark_file != None:
             command_file = path + benchmark_file
         else:
-            command_file = path + "directed_benchmark"
+            command_file = path + "benchmark"
         shutil.copy(command_file, directory)
         os.chdir(directory)
 
@@ -103,7 +103,7 @@ def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0,
         if benchmark_file != None:
             command_file = path + benchmark_file
         else:
-            command_file = path + "directed_benchmark"
+            command_file = path + "benchmark"
         shutil.copy(command_file, directory)
         os.chdir(directory)
 
@@ -119,9 +119,9 @@ def unweighted_directed_lfr_graph(N, mu, k, maxk, minc, maxc, deg_exp=1.0,
 
     return graph
 
-def unweighted_directed_lfr_graph_asarray(**kwargs):
+def unweighted_undirected_lfr_graph_asarray(**kwargs):
 
-    return np.asarray(nx.to_numpy_matrix(unweighted_directed_lfr_graph(**kwargs)))
+    return np.asarray(nx.to_numpy_matrix(unweighted_undirected_lfr_graph(**kwargs)))
 
 if __name__ == '__main__':
     """
