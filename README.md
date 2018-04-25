@@ -1,4 +1,14 @@
-Contains a module for generating hierarchical modular networks, a stochastic block model, a two community block model, and LFR benchmark graphs. 
+Contains a module for generating hierarchical modular networks, a stochastic block model, a two community block model, and LFR benchmark graphs. Install using either setuptools or pip:
+
+```bash
+pip install git+https://github.com/Nathaniel-Rodriguez/graphgen.git
+``` 
+
+or with setuptools after downloading and unpacking:
+
+```bash
+python setup.py install
+```
 
 The LFR graphs use code from Andrea Lancichinetti that has been lightly modified, replacing the file based input/output with a Python API.
 
