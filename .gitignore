@@ -2,14 +2,38 @@
 *.pyc
 
 # Setuptools distribution folder.
-/dist/
+dist/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 /*.egg
+build/
+cmake-build-debug/
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
 
 # Remove sublime projects
 *.sublime*
+.idea/
 
 # remove cache files
 /*__pycache__
+
+# non library folders
+old_files/

@@ -3,6 +3,7 @@ import numpy as np
 import random
 import itertools
 
+
 def random_product_without_replacement(*args, **kwargs):
     """
     Pulls random products of multiple lists without replacement.
@@ -43,6 +44,7 @@ def random_product_without_replacement(*args, **kwargs):
 
     return rvs
 
+
 def build_node2membership_translator(num_of_levels, communities_per_level, base_com_size):
     """
     Translate: nodes -> membership (given level)
@@ -52,6 +54,7 @@ def build_node2membership_translator(num_of_levels, communities_per_level, base_
                                for j in range(base_com_size * communities_per_level**l) } for l in range(num_of_levels) }
 
     return membership_struct
+
 
 def build_membership2node_translator(node2membership_translator):
 
@@ -69,11 +72,13 @@ def build_membership2node_translator(node2membership_translator):
 
     return keyLevel_valMembershipDict
 
+
 def assign_community_memberships(graph, num_of_levels, node2membership_translator):
 
     # Assign memberships
     for l in range(num_of_levels):
         nx.set_node_attributes(graph, l, node2membership_translator[l])
+
 
 def connect_base_layer(graph, membership2node_translator):
     """
@@ -85,9 +90,18 @@ def connect_base_layer(graph, membership2node_translator):
     for nodes in membership2node_translator[0].values():
         graph.add_edges_from(list(itertools.permutations(nodes, 2)))
 
-def connect_upper_layers(graph, num_of_levels, communities_per_level, attachment_probability,
-    connectivity_scaling, membership2node_translator):
+
+def connect_upper_layers(graph, num_of_levels, communities_per_level,
+                         attachment_probability, connectivity_scaling,
+                         membership2node_translator):
     """
+    :param graph:
+    :param num_of_levels:
+    :param communities_per_level:
+    :param attachment_probability:
+    :param connectivity_scaling:
+    :param membership2node_translator:
+    :return:
     """
 
     # Probabilistically connect other layers
@@ -127,14 +141,23 @@ def connect_upper_layers(graph, num_of_levels, communities_per_level, attachment
                 graph.add_edges_from(random_edges_1to2)
                 graph.add_edges_from(random_edges_2to1)
 
-def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size, 
-    attachment_probability, connectivity_scaling):
+
+def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
+                            attachment_probability, connectivity_scaling):
     """
     Builds a hierarchical modular network using the aglorithm from:
-    Moretti, P., & Munoz, M. A. (2013). Griffiths phases and the stretching of criticality in brain networks. 
-    Nature Communications, 4, 2521. https://doi.org/10.1038/ncomms3521
+    Moretti, P., & Munoz, M. A. (2013). Griffiths phases and the stretching of
+    criticality in brain networks. Nature Communications, 4, 2521.
+    https://doi.org/10.1038/ncomms3521
 
     Uses networkx and makes directed graphs.
+
+    :param num_of_levels:
+    :param communities_per_level:
+    :param base_com_size:
+    :param attachment_probability:
+    :param connectivity_scaling:
+    :return:
     """
 
     # Generate initial node set
@@ -142,7 +165,9 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
     graph = nx.DiGraph()
     graph.add_nodes_from(range(num_nodes))
 
-    node2membership_translator = build_node2membership_translator(num_of_levels, communities_per_level, base_com_size)
+    node2membership_translator = build_node2membership_translator(num_of_levels,
+                                                                  communities_per_level,
+                                                                  base_com_size)
     membership2node_translator = build_membership2node_translator(node2membership_translator)
     assign_community_memberships(graph, num_of_levels, node2membership_translator)
     connect_base_layer(graph, membership2node_translator)
@@ -151,9 +176,11 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
 
     return graph
 
-def unweighted_directed_hmn_as_asrray(**kwargs):
+
+def unweighted_directed_hmn_as_asarray(**kwargs):
 
     return np.asarray(nx.to_numpy_matrix(unweighted_directed_hmn(**kwargs)))
+
 
 if __name__ == '__main__':
     """

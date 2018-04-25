@@ -8,6 +8,7 @@ import scipy.stats as stats
 import sys
 import random as rnd
 
+
 def unweighted_two_community_graph(N, mu, avg_degree):
     """
     To create the graph we generate a poisson distributed number of edges for each 
@@ -43,6 +44,7 @@ def unweighted_two_community_graph(N, mu, avg_degree):
 
     return graph
 
+
 def add_edges_to_graph(graph, com1_set, com2_set, num_edges_to_add):
     com1_set = list(com1_set)
     com2_set = list(com2_set)
@@ -60,6 +62,7 @@ def add_edges_to_graph(graph, com1_set, com2_set, num_edges_to_add):
         else:
             graph.add_edge(tail, head)
 
+
 def uniform_weighted_two_community_graph(N, mu, avg_degree, lower_bound=0, upper_bound=1):
 
     graph = unweighted_two_community_graph(N, mu, avg_degree)
@@ -68,6 +71,7 @@ def uniform_weighted_two_community_graph(N, mu, avg_degree, lower_bound=0, upper
         graph[edge[0]][edge[1]]['weight'] = weights[i]
 
     return graph
+
 
 def gamma_weighted_two_community_graph(N, mu, avg_degree, EE_W=30000.0, negative_weights=False):
 
@@ -82,6 +86,7 @@ def gamma_weighted_two_community_graph(N, mu, avg_degree, EE_W=30000.0, negative
             graph[edge[0]][edge[1]]['weight'] = -weights[i]
 
     return graph
+
 
 def random_gamma(mean, size=1, shape=4.0):
     """
@@ -101,6 +106,7 @@ def random_gamma(mean, size=1, shape=4.0):
         shape = shape
         scale = mean / shape
         return -1. * stats.gamma.rvs(shape, size=size, loc=0.0, scale=scale)
+
 
 if __name__ == '__main__':
     

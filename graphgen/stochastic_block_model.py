@@ -7,6 +7,7 @@ import networkx as nx
 import scipy.stats as stats
 from itertools import product
 
+
 def generate_discrete_distribution(N, distribution_type, distribution_args=()):
     """
     Generates a sequence of distrete random variables for the 
@@ -30,8 +31,9 @@ def generate_discrete_distribution(N, distribution_type, distribution_args=()):
     elif distribution_type == 'powerlaw' or distribution_type == 'zipf':
         return stats.zipf(*distribution_args).rvs(size=N)
 
-def generate_continuous_distribution(E, distribution_type, distribution_args=(), 
-    sign_flip_fraction=0.0):
+
+def generate_continuous_distribution(E, distribution_type, distribution_args=(),
+                                     sign_flip_fraction=0.0):
     """
     Generates a sequence of continuous weights for each edge.
     It also supports a fraction that are made negative.
@@ -71,14 +73,15 @@ def generate_continuous_distribution(E, distribution_type, distribution_args=(),
 
     return rvs
 
+
 def calculate_node_connection_probabilities(node_degrees):
     total_group_degree = np.sum(node_degrees)
     return [ expected_degree / float(total_group_degree) 
             for expected_degree in node_degrees ]
 
-def calculate_expected_degrees(group_sizes, 
-    degree_distribution_parameter_vector, 
-    degree_distribution, correlated_inout_degree):
+
+def calculate_expected_degrees(group_sizes, degree_distribution_parameter_vector,
+                               degree_distribution, correlated_inout_degree):
 
     num_groups = len(group_sizes)
     expected_node_indegrees_by_group = \
@@ -97,11 +100,12 @@ def calculate_expected_degrees(group_sizes,
 
     return expected_node_indegrees_by_group, expected_node_outdegrees_by_group
 
-def connect_edge_bundle(graph, 
-    source_group_size, target_group_size, 
-    source_group_nodes, target_group_nodes,
-    connection_prob_between_groups,
-    source_connection_probs_by_node, target_connection_probs_by_node):
+
+def connect_edge_bundle(graph, source_group_size, target_group_size,
+                        source_group_nodes, target_group_nodes,
+                        connection_prob_between_groups,
+                        source_connection_probs_by_node,
+                        target_connection_probs_by_node):
 
     num_edges = np.random.poisson(connection_prob_between_groups 
                                 * source_group_size * target_group_size)
@@ -120,6 +124,7 @@ def connect_edge_bundle(graph,
 
     return possible_edges[chosen_edges]
 
+
 def add_connection_weights(graph, edges, distribution_args, 
     distribution_type, flip_fraction):
 
@@ -131,12 +136,16 @@ def add_connection_weights(graph, edges, distribution_args,
         nx.set_edge_attributes(graph, 'weight', { tuple(edges[i]) : weights[i] 
                                                 for i in range(len(edges)) })
 
+
 def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict):
 
     if edge_attribute_dict['distribution_type'] == 'discrete':
         rvs_generator = self.generate_discrete_distribution
     if edge_attribute_dict['distribution_type'] == 'continuous':
         rvs_generator = self.generate_continuous_distribution
+    else:
+        raise ValueError("Error: does not support distribution type "
+                         + str(edge_attribute_dict['distribution_type']))
 
     for bundle, edges in edge_bundles_by_group.items():
         if len(edges) != 0:
@@ -147,20 +156,24 @@ def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict):
             nx.set_edge_attributes(graph, edge_attribute_dict['key'],
                 {tuple(edges[i]) : rvs[i] for i in range(len(edges))})
 
+
 def remove_self_loops(graph):
 
     for node in graph.nodes_iter():
         if graph.has_edge(node,node):
             graph.remove_edge(node,node)
 
+
 def weighted_directed_stochastic_block_model(N, relative_group_sizes,
-    connectivity_block_matrix,
-    weight_distribution_parameter_matrix,
-    degree_distribution_parameter_vector,
-    negative_weight_fraction_matrix=None,
-    weight_distribution="gamma", degree_distribution="poisson", 
-    correlated_inout_degree=True, self_loops=False,
-    other_edge_block_attributes=[]):
+                                             connectivity_block_matrix,
+                                             weight_distribution_parameter_matrix,
+                                             degree_distribution_parameter_vector,
+                                             negative_weight_fraction_matrix=None,
+                                             weight_distribution="gamma",
+                                             degree_distribution="poisson",
+                                             correlated_inout_degree=True,
+                                             self_loops=False,
+                                             other_edge_block_attributes=[]):
     """
     N - number of nodes in the graph
     relative_group_sizes - sequence with magnitudes (will be normalized internally)
@@ -266,19 +279,12 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
 
     return graph
 
+
 def weighted_directed_stochastic_block_model_asarray(**kwargs):
 
     return np.asarray(nx.to_numpy_matrix(\
                         weighted_directed_stochastic_block_model(**kwargs)))
 
-# def undirected_stochastic_block_model(N, relative_group_sizes,
-#     connectivity_block_matrix, degree_distribution_parameter_vector,
-#     self_loops=False, degree_distribution="poisson"):
-
-# def undirected_stochastic_block_model_asarray(**kwargs):
-
-#     return np.asarray(nx.to_numpy_matrix(\
-#                         undirected_stochastic_block_model(**kwargs)))
 
 if __name__ == '__main__':
     """
