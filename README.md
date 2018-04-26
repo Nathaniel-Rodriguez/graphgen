@@ -57,4 +57,4 @@ Currently four base versions of the LFR benchmark graphs are available:
 - unweighted_undirected_lfr_graph
 - unweighted_directed_lfr_graph
 
-Use `help()` on these function's doc strings to get argument information. Seeds are required for all of them and are not optional.
+Use `help()` on these function's to get argument information. Seeds are required for all of them and are not optional.

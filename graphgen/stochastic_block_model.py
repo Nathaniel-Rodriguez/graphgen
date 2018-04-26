@@ -3,12 +3,12 @@ Graphs generated follow the i->j connection scheme
 """
 
 import numpy as np 
-import networkx as nx 
-import scipy.stats as stats
+import networkx as nx
 from itertools import product
 
 
-def generate_discrete_distribution(N, distribution_type, distribution_args=()):
+def generate_discrete_distribution(random_state, N, distribution_type,
+                                   distribution_args=None):
     """
     Generates a sequence of distrete random variables for the 
     degree distribution given the parameters for the distribution
@@ -20,19 +20,25 @@ def generate_discrete_distribution(N, distribution_type, distribution_args=()):
         uniform: low, high
         powerlaw: rank, exponent
 
+    :param random_state: a np.random.RandomState
+
     """
 
+    if distribution_args is None:
+        distribution_args = ()
+
     if distribution_type == 'poisson':
-        return stats.poisson(*distribution_args).rvs(size=N)
+        return random_state.poisson(*distribution_args, size=N)
 
     elif distribution_type == 'uniform':
-        return stats.randint(*distribution_args).rvs(size=N)
+        return random_state.randint(*distribution_args, size=N)
 
     elif distribution_type == 'powerlaw' or distribution_type == 'zipf':
-        return stats.zipf(*distribution_args).rvs(size=N)
+        return random_state.zipf(*distribution_args, size=N)
 
 
-def generate_continuous_distribution(E, distribution_type, distribution_args=(),
+def generate_continuous_distribution(random_state, E, distribution_type,
+                                     distribution_args=None,
                                      sign_flip_fraction=0.0):
     """
     Generates a sequence of continuous weights for each edge.
@@ -50,25 +56,29 @@ def generate_continuous_distribution(E, distribution_type, distribution_args=(),
         gamma: a, (loc,scale)
         lognormal: s, (loc,scale)
 
+    :param random_state: a np.random.RandomState.
     """
 
+    if distribution_args is None:
+        distribution_args = ()
+
     if distribution_type == "norm" or distribution_type == "normal":
-        rvs = stats.gennorm(*distribution_args).rvs(size=E)
+        rvs = random_state.gennorm(*distribution_args, size=E)
 
     elif distribution_type == "uniform":
-        rvs = stats.uniform(*distribution_args).rvs(size=E)
+        rvs = random_state.uniform(*distribution_args, size=E)
 
     elif distribution_type == "pareto":
-        rvs = stats.pareto(*distribution_args).rvs(size=E)
+        rvs = random_state.pareto(*distribution_args, size=E)
 
     elif distribution_type == "gamma":
-        rvs = stats.gamma(*distribution_args).rvs(size=E)
+        rvs = random_state.gamma(*distribution_args, size=E)
 
     elif distribution_type == "lognorm":
-        rvs = stats.lognorm(*distribution_args).rvs(size=E)
+        rvs = random_state.lognorm(*distribution_args, size=E)
 
     num_to_flip = int(E * sign_flip_fraction)
-    indices_to_flip = np.random.choice(range(E), size=num_to_flip, replace=False)
+    indices_to_flip = random_state.choice(range(E), size=num_to_flip, replace=False)
     rvs[indices_to_flip] = -1 * rvs[indices_to_flip]
 
     return rvs
@@ -105,9 +115,24 @@ def connect_edge_bundle(graph, source_group_size, target_group_size,
                         source_group_nodes, target_group_nodes,
                         connection_prob_between_groups,
                         source_connection_probs_by_node,
-                        target_connection_probs_by_node):
+                        target_connection_probs_by_node,
+                        random_state=None):
+    """
+    :param graph:
+    :param source_group_size:
+    :param target_group_size:
+    :param source_group_nodes:
+    :param target_group_nodes:
+    :param connection_prob_between_groups:
+    :param source_connection_probs_by_node:
+    :param target_connection_probs_by_node:
+    :param seed: None, else an integer
+    :param random_state: None, else a np.random.RandomState. If not set then
+        one is generated with a seed, else with the default seed of RandomState
+    :return:
+    """
 
-    num_edges = np.random.poisson(connection_prob_between_groups 
+    num_edges = random_state.poisson(connection_prob_between_groups
                                 * source_group_size * target_group_size)
     possible_edges = np.array(list(product(source_group_nodes, 
                                             target_group_nodes)))
@@ -117,7 +142,7 @@ def connect_edge_bundle(graph, source_group_size, target_group_size,
     # Chose only up to # of non-zero
     if num_edges > np.count_nonzero(edge_probabilities):
         num_edges = np.count_nonzero(edge_probabilities)
-    chosen_edges = np.random.choice(len(possible_edges), 
+    chosen_edges = random_state.choice(len(possible_edges),
                         size=num_edges, replace=False, p=edge_probabilities)
 
     graph.add_edges_from(possible_edges[chosen_edges])
@@ -126,10 +151,10 @@ def connect_edge_bundle(graph, source_group_size, target_group_size,
 
 
 def add_connection_weights(graph, edges, distribution_args, 
-    distribution_type, flip_fraction):
+    distribution_type, flip_fraction, random_state):
 
     if len(edges) != 0:
-        weights = generate_continuous_distribution(len(edges), 
+        weights = generate_continuous_distribution(random_state, len(edges),
                                                 distribution_type, 
                                                 distribution_args, 
                                                 flip_fraction)
@@ -137,7 +162,8 @@ def add_connection_weights(graph, edges, distribution_args,
                                                 for i in range(len(edges)) })
 
 
-def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict):
+def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict,
+                        random_state):
 
     if edge_attribute_dict['distribution_type'] == 'discrete':
         rvs_generator = self.generate_discrete_distribution
@@ -149,7 +175,7 @@ def add_edge_attributes(graph, edge_bundles_by_group, edge_attribute_dict):
 
     for bundle, edges in edge_bundles_by_group.items():
         if len(edges) != 0:
-            rvs = rvs_generator(len(edges), 
+            rvs = rvs_generator(random_state, len(edges),
                     edge_attribute_dict['distribution'],
                     edge_attribute_dict['distribution_param_matrix']\
                                         [bundle[0], bundle[1]])
@@ -173,7 +199,9 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
                                              degree_distribution="poisson",
                                              correlated_inout_degree=True,
                                              self_loops=False,
-                                             other_edge_block_attributes=[]):
+                                             other_edge_block_attributes=[],
+                                             seed=None,
+                                             random_state=None):
     """
     N - number of nodes in the graph
     relative_group_sizes - sequence with magnitudes (will be normalized internally)
@@ -214,7 +242,16 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
             distribution - name of distribution
             distribution_type - continuous/discrete
 
+    :param seed: None, else an integer
+    :param random_state: None, else a np.random.RandomState. If not set then
+        one is generated with a seed, else with the default seed of RandomState
+
     """
+    if random_state is None:
+        if seed is None:
+            random_state = np.random.RandomState()
+        else:
+            random_state = np.random.RandomState(seed)
 
     num_groups = len(relative_group_sizes)
     group_sizes = np.array(list(map(int, N * relative_group_sizes 
@@ -255,26 +292,29 @@ def weighted_directed_stochastic_block_model(N, relative_group_sizes,
                 community_to_nodelist_dictionary[target_group],
                 connectivity_block_matrix[source_group, target_group],
                 out_connection_prob_by_group[source_group], 
-                in_connection_prob_by_group[target_group])
+                in_connection_prob_by_group[target_group],
+                                    random_state)
 
     # Add weights
     for bundle, edges in edge_bundles_by_group.items():
         add_connection_weights(graph, edges, 
             weight_distribution_parameter_matrix[bundle[0], bundle[1]],
             weight_distribution, negative_weight_fraction_matrix[bundle[0], 
-                                                                bundle[1]])
+                                                                bundle[1]],
+                               random_state)
 
     # Add other attributes
     for edge_block_attributes in other_edge_block_attributes:
-        add_edge_attributes(graph, edge_bundles_by_group, 
-                            edge_block_attributes)
+        add_edge_attributes(graph, edge_bundles_by_group,
+                            edge_block_attributes,
+                            random_state)
 
     if not self_loops:
         remove_self_loops(graph)
 
     # Relabel all the nodes
     mapping = { old_label: new_label 
-            for old_label, new_label in enumerate(np.random.permutation(N)) }
+            for old_label, new_label in enumerate(random_state.permutation(N)) }
     graph = nx.relabel_nodes(graph, mapping, copy=True)
 
     return graph
