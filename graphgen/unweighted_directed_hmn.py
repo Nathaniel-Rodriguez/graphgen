@@ -1,6 +1,5 @@
 import networkx as nx
 import numpy as np
-import random
 import itertools
 
 
@@ -12,6 +11,7 @@ def random_product_without_replacement(*args, **kwargs):
     """
 
     size = kwargs.get('size', 1)
+    random_state = kwargs['random_state']
     used = set()
     pools = list(map(tuple, args))
     
@@ -28,16 +28,18 @@ def random_product_without_replacement(*args, **kwargs):
     # products just build a list of the options and pull from that
     elif size >= (max_product / 10):
         products = list(itertools.product(*pools))
-        random.shuffle(products)
+        random_state.shuffle(products)
         return products[:size]
     
     # if size is much less than the number of products generate rv's on the fly
     else:
         rvs = []
         for _ in range(size):
-            rv = tuple(random.choice(pool) for pool in pools)
+            # rv = tuple(random.choice(pool) for pool in pools)
+            rv = tuple(random_state.choice(pools, k=len(pools)))
             while rv in used:
-                rv = tuple(random.choice(pool) for pool in pools)
+                # rv = tuple(random.choice(pool) for pool in pools)
+                rv = tuple(random_state.choice(pools, k=len(pools)))
 
             rvs.append(rv)
             used.add(rv)
@@ -49,9 +51,12 @@ def build_node2membership_translator(num_of_levels, communities_per_level, base_
     """
     Translate: nodes -> membership (given level)
     """
-    membership_struct = { l : { membership * base_com_size * communities_per_level**l + j : membership 
-                               for membership in range(int(communities_per_level**num_of_levels / communities_per_level**l)) 
-                               for j in range(base_com_size * communities_per_level**l) } for l in range(num_of_levels) }
+    membership_struct = {l: {membership * base_com_size
+                             * communities_per_level**l + j: membership
+                             for membership in range(int(communities_per_level**num_of_levels
+                                                         / communities_per_level**l))
+                             for j in range(base_com_size * communities_per_level**l)}
+                         for l in range(num_of_levels)}
 
     return membership_struct
 
@@ -66,7 +71,7 @@ def build_membership2node_translator(node2membership_translator):
             if membership in keyMembership_valNodes:
                 keyMembership_valNodes[membership].append(node)
             else:
-                keyMembership_valNodes[membership] = [ node ]
+                keyMembership_valNodes[membership] = [node]
 
         keyLevel_valMembershipDict[l] = keyMembership_valNodes
 
@@ -93,23 +98,25 @@ def connect_base_layer(graph, membership2node_translator):
 
 def connect_upper_layers(graph, num_of_levels, communities_per_level,
                          attachment_probability, connectivity_scaling,
-                         membership2node_translator):
+                         membership2node_translator, random_state):
     """
-    :param graph:
-    :param num_of_levels:
-    :param communities_per_level:
-    :param attachment_probability:
-    :param connectivity_scaling:
-    :param membership2node_translator:
-    :return:
+    :param graph: current graph
+    :param num_of_levels: number of levels in hierarchy
+    :param communities_per_level: number of communities for each level
+    :param attachment_probability: probability of attaching nodes
+    :param connectivity_scaling: scaling of node attachment probability between levels
+    :param membership2node_translator: dictionary for node community membership
+    :param random_state: numpy RandomState
+    :return: none
     """
 
     # Probabilistically connect other layers
-    for l in range(1,num_of_levels):
+    for l in range(1, num_of_levels):
 
         # Construct block-set list
-        block_sets = [ [ i+j for j in range(communities_per_level) ] 
-                      for i in range(0, len(membership2node_translator[l]), communities_per_level) ]
+        block_sets = [[i+j for j in range(communities_per_level)]
+                      for i in range(0, len(membership2node_translator[l]),
+                                     communities_per_level)]
 
         for block_set in block_sets:
             for block1, block2 in itertools.permutations(block_set, 2):
@@ -119,7 +126,7 @@ def connect_upper_layers(graph, num_of_levels, communities_per_level,
                 size_of_group2 = len(membership2node_translator[l][block2])
                 num_of_expected_events = connectivity_scaling * attachment_probability ** l * \
                     ((size_of_group1 + size_of_group2) / 2)**2
-                num_edges_1to2, num_edges_2to1 = np.random.poisson(num_of_expected_events, size=2)
+                num_edges_1to2, num_edges_2to1 = random_state.poisson(num_of_expected_events, size=2)
 
                 # Make sure graph is connected and edges doesn't exceed max possible connections
                 if num_edges_1to2 < 1:
@@ -132,18 +139,21 @@ def connect_upper_layers(graph, num_of_levels, communities_per_level,
                     num_edges_2to1 = size_of_group1 * size_of_group2
 
                 random_edges_1to2 = random_product_without_replacement(membership2node_translator[l][block1],
-                                                                      membership2node_translator[l][block2], 
-                                                                       size=num_edges_1to2)
+                                                                       membership2node_translator[l][block2],
+                                                                       size=num_edges_1to2,
+                                                                       random_state=random_state)
                 random_edges_2to1 = random_product_without_replacement(membership2node_translator[l][block2],
-                                                                      membership2node_translator[l][block1],
-                                                                      size=num_edges_2to1)
+                                                                       membership2node_translator[l][block1],
+                                                                       size=num_edges_2to1,
+                                                                       random_state=random_state)
 
                 graph.add_edges_from(random_edges_1to2)
                 graph.add_edges_from(random_edges_2to1)
 
 
 def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
-                            attachment_probability, connectivity_scaling):
+                            attachment_probability, connectivity_scaling,
+                            random_state):
     """
     Builds a hierarchical modular network using the aglorithm from:
     Moretti, P., & Munoz, M. A. (2013). Griffiths phases and the stretching of
@@ -152,12 +162,13 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
 
     Uses networkx and makes directed graphs.
 
-    :param num_of_levels:
-    :param communities_per_level:
-    :param base_com_size:
-    :param attachment_probability:
-    :param connectivity_scaling:
-    :return:
+    :param num_of_levels: the number of levels in the hierarchy
+    :param communities_per_level: the number of communities for each level
+    :param base_com_size: the size of the lowest communities
+    :param attachment_probability: probability of attaching nodes
+    :param connectivity_scaling: scaling of node attachment probability between levels
+    :param random_state: a numpy RandomState
+    :return: returns a networkx graph
     """
 
     # Generate initial node set
@@ -172,7 +183,7 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
     assign_community_memberships(graph, num_of_levels, node2membership_translator)
     connect_base_layer(graph, membership2node_translator)
     connect_upper_layers(graph, num_of_levels, communities_per_level, attachment_probability,
-        connectivity_scaling, membership2node_translator)
+        connectivity_scaling, membership2node_translator, random_state)
 
     return graph
 

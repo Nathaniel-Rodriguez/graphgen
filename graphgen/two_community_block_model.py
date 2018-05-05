@@ -3,7 +3,6 @@ Generates weighted or unweighted graphs using a block model.
 """
 
 import networkx as nx 
-import numpy as np
 
 
 def unweighted_two_community_graph(random_state, N, mu, avg_degree):
