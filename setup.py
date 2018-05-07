@@ -10,9 +10,14 @@ def readme():
 extra_compile_args = ['-std=c++14', '-Wno-write-strings']
 extra_link_args = ['-Wl,--verbose', '-lstdc++']
 
+# Get numpy include dirs
+import numpy as np
+numpy_include_path = np.get_include()
+
 # Unweighted directed module specifications
 unweighted_directed_include_dirs = [
-    'graphgen/unweighted_directed'
+    'graphgen/unweighted_directed',
+    numpy_include_path
     ]
 
 unweighted_directed_sources = [
@@ -29,7 +34,8 @@ unweighted_directed_module = Extension('unweighted_directed_graph_generator',
 
 # Unweighted undirected module specifications
 unweighted_undirected_include_dirs = [
-    'graphgen/unweighted_undirected'
+    'graphgen/unweighted_undirected',
+    numpy_include_path
 ]
 
 unweighted_undirected_sources = [
@@ -46,7 +52,8 @@ unweighted_undirected_module = Extension('unweighted_undirected_graph_generator'
 
 # weighted directed module specifications
 weighted_directed_include_dirs = [
-    'graphgen/weighted_directed'
+    'graphgen/weighted_directed',
+    numpy_include_path
 ]
 
 weighted_directed_sources = [
@@ -63,7 +70,8 @@ weighted_directed_module = Extension('weighted_directed_graph_generator',
 
 # weighted undirected module specifications
 weighted_undirected_include_dirs = [
-    'graphgen/weighted_undirected'
+    'graphgen/weighted_undirected',
+    numpy_include_path
 ]
 
 weighted_undirected_sources = [
