@@ -8,7 +8,7 @@ def readme():
 
 # Compiler settings
 extra_compile_args = ['-std=c++14', '-Wno-write-strings']
-extra_link_args = ['-Wl,--verbose', '-lstdc++']
+extra_link_args = ['-Wl,--verbose', '-lstdc++']  #-lc++ for clang?
 
 # Get numpy include dirs
 import numpy as np

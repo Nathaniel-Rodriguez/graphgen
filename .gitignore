@@ -9,6 +9,7 @@ dist/
 /*.egg
 build/
 cmake-build-debug/
+CMakeLists.txt
 
 # Prerequisites
 *.d
