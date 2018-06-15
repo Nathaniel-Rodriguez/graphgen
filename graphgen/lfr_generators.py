@@ -38,6 +38,8 @@ def weighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mut,
     :param randomf: -
     :param avg_clustering: the average clustering coefficient
     :return: (Ex2 numpy array, tuple community memberships for each node, E numpy array)
+     * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
+     * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
     edge_array, community_memberships, weights = GenerateWeightedUndirectedGraph(
         num_nodes, average_k, max_degree, mut, muw, com_size_min, com_size_max,
@@ -116,6 +118,8 @@ def weighted_directed_lfr_graph(num_nodes, average_k, max_degree, mut,
     :param defect: -
     :param randomf: -
     :return: (Ex2 numpy array, tuple community memberships for each node, E numpy array)
+     * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
+     * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
     edge_array, community_memberships, weights = GenerateWeightedDirectedGraph(
         num_nodes, average_k, max_degree, mut, muw, com_size_min, com_size_max,
@@ -264,6 +268,8 @@ def unweighted_directed_lfr_graph(num_nodes, average_k, max_degree, mu,
     :param defect: -
     :param randomf: -
     :return: (Ex2 numpy array, tuple community memberships for each node)
+     * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
+     * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
     edge_array, community_memberships = GenerateUnweightedDirectedGraph(
         num_nodes, average_k, max_degree, mu, com_size_min, com_size_max, seed, 

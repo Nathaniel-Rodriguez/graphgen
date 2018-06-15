@@ -66,6 +66,10 @@ static PyObject *GenerateUnweightedDirectedGraph(PyObject *self, PyObject *args,
   return return_tuple;
 }
 
+/*
+ * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
+ * Row major format
+ */
 PyObject* ConvertEdgeDequeToNumpyArray(const std::deque<std::set<int> >& Eout) {
   // Determine the number of edges for the array
   npy_intp num_edges(0);
@@ -123,7 +127,8 @@ static PyMethodDef UnweightedDirectedGraphGeneratorMethods[] = {
   { "GenerateUnweightedDirectedGraph", (PyCFunction) GenerateUnweightedDirectedGraph,
           METH_VARARGS | METH_KEYWORDS,
           "Creates unweighted directed LFR graphs. Returns Ex2 numpy edge "
-          "array and tuple of community assignments"},
+          "array and tuple of community assignments. Array is row-major with"
+          "[edge#][0]=tail and [edge#][1]=head"},
   { NULL, NULL, 0, NULL}
 };
 
