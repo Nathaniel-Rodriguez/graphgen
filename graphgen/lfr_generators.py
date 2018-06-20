@@ -79,12 +79,22 @@ def weighted_undirected_lfr_as_nx(*args, **kwargs):
 def weighted_undirected_lfr_as_adj(*args, **kwargs):
     """
     Calls weighted_undirected_lfr_graph and converts to a numpy matrix
+    :param transpose: transpose the matrix representation
     :return: NxN float32 numpy array, and community membership
         adj matrix: axis1 (minor) is tail, axis2 (major) is head
+        or (transpose): axis1 is head, axis2 is tail
     """
 
-    edge_array, community_membership, weights = weighted_undirected_lfr_graph(*args, **kwargs)
-    return (convert_weighted_to_numpy_matrix(edge_array, community_membership, weights),
+    graph_pars = {key: value for key, value in kwargs.items()
+                  if key in inspect.getargspec(weighted_undirected_lfr_graph).args}
+
+    converter_pars = {key: value for key, value in kwargs.items()
+                      if key in inspect.getargspec(convert_weighted_to_numpy_matrix).args}
+
+    edge_array, community_membership, weights = weighted_undirected_lfr_graph(*args,
+                                                                              **graph_pars)
+    return (convert_weighted_to_numpy_matrix(edge_array, community_membership,
+                                             weights, **converter_pars),
             community_membership)
 
 
@@ -135,7 +145,8 @@ def weighted_directed_lfr_as_nx(*args, **kwargs):
     Calls weighted_directed_lfr_graph and converts to a networkx graph
     :return: networkx graph
     """
-    edge_array, community_memberships, weights = weighted_directed_lfr_graph(*args, **kwargs)
+    edge_array, community_memberships, weights = weighted_directed_lfr_graph(*args,
+                                                                             **kwargs)
 
     nx_graph = nx.DiGraph()
     # Add nodes and attributes to graph
@@ -159,12 +170,22 @@ def weighted_directed_lfr_as_nx(*args, **kwargs):
 def weighted_directed_lfr_as_adj(*args, **kwargs):
     """
     Calls weighted_directed_lfr_graph and converts to a numpy matrix
+    :param transpose: transpose the matrix representation
     :return: NxN float32 numpy array, and community membership
         adj matrix: axis1 (minor) is tail, axis2 (major) is head
+        or (transpose): axis1 is head, axis2 is tail
     """
 
-    edge_array, community_membership, weights = weighted_directed_lfr_graph(*args, **kwargs)
-    return (convert_weighted_to_numpy_matrix(edge_array, community_membership, weights),
+    graph_pars = {key: value for key, value in kwargs.items()
+                  if key in inspect.getargspec(weighted_directed_lfr_graph).args}
+
+    converter_pars = {key: value for key, value in kwargs.items()
+                      if key in inspect.getargspec(convert_weighted_to_numpy_matrix).args}
+
+    edge_array, community_membership, weights = weighted_directed_lfr_graph(*args,
+                                                                            **graph_pars)
+    return (convert_weighted_to_numpy_matrix(edge_array, community_membership,
+                                             weights, **converter_pars),
             community_membership)
 
 
@@ -234,11 +255,22 @@ def unweighted_undirected_lfr_as_adj(*args, **kwargs):
     """
     Nodes start at 0 and are contiguous
     Calls unweighted_undirected_lfr_graph and converts to an adjacency matrix
+    :param transpose: transpose the matrix representation
     :return: Return a adj matrix: axis1 (minor) is tail, axis2 (major) is head
         and return community membership
+        or (transpose): axis1 is head, axis2 is tail
     """
-    edge_array, community_memberships = unweighted_undirected_lfr_graph(*args, **kwargs)
-    return (convert_unweighted_to_numpy_matrix(edge_array, len(community_memberships)),
+
+    graph_pars = {key: value for key, value in kwargs.items()
+                  if key in inspect.getargspec(unweighted_undirected_lfr_graph).args}
+
+    converter_pars = {key: value for key, value in kwargs.items()
+                      if key in inspect.getargspec(convert_unweighted_to_numpy_matrix).args}
+
+    edge_array, community_memberships = unweighted_undirected_lfr_graph(*args, **graph_pars)
+    return (convert_unweighted_to_numpy_matrix(edge_array,
+                                               len(community_memberships),
+                                               **converter_pars),
             community_memberships)
 
 
@@ -308,19 +340,32 @@ def unweighted_directed_lfr_as_adj(*args, **kwargs):
     """
     Nodes start at 0 and are contiguous
     Calls unweighted_directed_lfr_graph and converts to an adjacency matrix
+    :param transpose: transpose the matrix representation
     :return: Return a adj matrix: axis1 (minor) is tail, axis2 (major) is head
         and return community membership
+        or (transpose): axis1 is head, axis2 is tail
     """
-    edge_array, community_memberships = unweighted_directed_lfr_graph(*args, **kwargs)
-    return (convert_unweighted_to_numpy_matrix(edge_array, len(community_memberships)),
+
+    graph_pars = {key: value for key, value in kwargs.items()
+                  if key in inspect.getargspec(unweighted_directed_lfr_graph).args}
+
+    converter_pars = {key: value for key, value in kwargs.items()
+                      if key in inspect.getargspec(convert_unweighted_to_numpy_matrix).args}
+
+    edge_array, community_memberships = unweighted_directed_lfr_graph(*args, **graph_pars)
+    return (convert_unweighted_to_numpy_matrix(edge_array,
+                                               len(community_memberships),
+                                               **converter_pars),
             community_memberships)
 
 
-def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights):
+def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights, transpose=False):
     """
     :param edge_array: Ex2 numpy array
     :param num_nodes: N
     :param weights: E np.float32 array
+    :param transpose: transposes output matrix to reverse representation order
+        default: False
     :return: dtype=np.float32 NxN matrix
     """
 
@@ -328,19 +373,27 @@ def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights):
     for i, edge in enumerate(edge_array):
         matrix[edge[0], edge[1]] = weights[i]
 
+    if transpose:
+        return matrix.transpose().copy()
+
     return matrix
 
 
-def convert_unweighted_to_numpy_matrix(edge_array, num_nodes):
+def convert_unweighted_to_numpy_matrix(edge_array, num_nodes, transpose=False):
     """
     :param edge_array: Ex2 numpy array
     :param num_nodes: N
+    :param transpose: transposes output matrix to reverse representation order
+        default: False
     :return: dtype=np.uint64 NxN matrix
     """
 
     matrix = np.zeros((num_nodes, num_nodes), dtype=np.uint64)
     for edge in edge_array:
         matrix[edge[0], edge[1]] = 1
+
+    if transpose:
+        return matrix.transpose().copy()
 
     return matrix
 
