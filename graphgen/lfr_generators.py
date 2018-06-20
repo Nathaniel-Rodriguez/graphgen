@@ -4,6 +4,7 @@ from graphgen.weighted_directed_graph_generator import GenerateWeightedDirectedG
 from graphgen.unweighted_directed_graph_generator import GenerateUnweightedDirectedGraph
 import networkx as nx
 import numpy as np
+import inspect
 
 
 def weighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mut,
