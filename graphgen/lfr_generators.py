@@ -87,15 +87,15 @@ def weighted_undirected_lfr_as_adj(*args, **kwargs):
     """
 
     graph_pars = {key: value for key, value in kwargs.items()
-                  if key in inspect.getargspec(weighted_undirected_lfr_graph).args}
+                  if key in inspect.getfullargspec(weighted_undirected_lfr_graph).args}
 
     converter_pars = {key: value for key, value in kwargs.items()
-                      if key in inspect.getargspec(convert_weighted_to_numpy_matrix).args}
+                      if key in inspect.getfullargspec(convert_weighted_to_numpy_matrix).args}
 
     edge_array, community_membership, weights = weighted_undirected_lfr_graph(*args,
                                                                               **graph_pars)
-    return (convert_weighted_to_numpy_matrix(edge_array, community_membership,
-                                             weights, **converter_pars),
+    return (convert_weighted_to_numpy_matrix(edge_array,
+                                             weights=weights, **converter_pars),
             community_membership)
 
 
@@ -178,15 +178,15 @@ def weighted_directed_lfr_as_adj(*args, **kwargs):
     """
 
     graph_pars = {key: value for key, value in kwargs.items()
-                  if key in inspect.getargspec(weighted_directed_lfr_graph).args}
+                  if key in inspect.getfullargspec(weighted_directed_lfr_graph).args}
 
     converter_pars = {key: value for key, value in kwargs.items()
-                      if key in inspect.getargspec(convert_weighted_to_numpy_matrix).args}
+                      if key in inspect.getfullargspec(convert_weighted_to_numpy_matrix).args}
 
     edge_array, community_membership, weights = weighted_directed_lfr_graph(*args,
                                                                             **graph_pars)
-    return (convert_weighted_to_numpy_matrix(edge_array, community_membership,
-                                             weights, **converter_pars),
+    return (convert_weighted_to_numpy_matrix(edge_array,
+                                             weights=weights, **converter_pars),
             community_membership)
 
 
@@ -263,14 +263,13 @@ def unweighted_undirected_lfr_as_adj(*args, **kwargs):
     """
 
     graph_pars = {key: value for key, value in kwargs.items()
-                  if key in inspect.getargspec(unweighted_undirected_lfr_graph).args}
+                  if key in inspect.getfullargspec(unweighted_undirected_lfr_graph).args}
 
     converter_pars = {key: value for key, value in kwargs.items()
-                      if key in inspect.getargspec(convert_unweighted_to_numpy_matrix).args}
+                      if key in inspect.getfullargspec(convert_unweighted_to_numpy_matrix).args}
 
     edge_array, community_memberships = unweighted_undirected_lfr_graph(*args, **graph_pars)
     return (convert_unweighted_to_numpy_matrix(edge_array,
-                                               len(community_memberships),
                                                **converter_pars),
             community_memberships)
 
@@ -348,14 +347,13 @@ def unweighted_directed_lfr_as_adj(*args, **kwargs):
     """
 
     graph_pars = {key: value for key, value in kwargs.items()
-                  if key in inspect.getargspec(unweighted_directed_lfr_graph).args}
+                  if key in inspect.getfullargspec(unweighted_directed_lfr_graph).args}
 
     converter_pars = {key: value for key, value in kwargs.items()
-                      if key in inspect.getargspec(convert_unweighted_to_numpy_matrix).args}
+                      if key in inspect.getfullargspec(convert_unweighted_to_numpy_matrix).args}
 
     edge_array, community_memberships = unweighted_directed_lfr_graph(*args, **graph_pars)
     return (convert_unweighted_to_numpy_matrix(edge_array,
-                                               len(community_memberships),
                                                **converter_pars),
             community_memberships)
 
