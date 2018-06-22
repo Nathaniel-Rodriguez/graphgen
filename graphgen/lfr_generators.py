@@ -16,8 +16,8 @@ def weighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mut,
                                   tau=2.0, tau2=1.0, overlapping_nodes=0,
                                   overlap_membership=0, fixed_range=True,
                                   excess=False, defect=False, randomf=False,
-                                  avg_clustering=0.0, edge_dtype=DEFAULT_INT,
-                                  weight_dtype=DEFAULT_FLOAT):
+                                  avg_clustering=0.0, edge_dtype=None,
+                                  weight_dtype=None):
     """
     Nodes start at 0 and are contiguous
     Return Ex2 numpy array, tuple of community memberships for each node,
@@ -49,6 +49,12 @@ def weighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mut,
      * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
      * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
+
+    if edge_dtype is None:
+        edge_dtype = DEFAULT_INT
+    if weight_dtype is None:
+        weight_dtype = DEFAULT_FLOAT
+
     edge_array, community_memberships, weights = GenerateWeightedUndirectedGraph(
         num_nodes, average_k, max_degree, mut, muw, com_size_min, com_size_max,
         seed, tau, tau2, overlapping_nodes, overlap_membership, fixed_range,
@@ -116,7 +122,7 @@ def weighted_directed_lfr_graph(num_nodes, average_k, max_degree, mut,
                                 tau=2.0, tau2=1.0, overlapping_nodes=0,
                                 overlap_membership=0, fixed_range=True,
                                 excess=False, defect=False, randomf=False,
-                                edge_dtype=DEFAULT_INT, weight_dtype=DEFAULT_FLOAT):
+                                edge_dtype=None, weight_dtype=None):
     """
     Nodes start at 0 and are contiguous
     Return Ex2 numpy array, tuple of community memberships for each node,
@@ -147,6 +153,12 @@ def weighted_directed_lfr_graph(num_nodes, average_k, max_degree, mut,
      * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
      * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
+
+    if edge_dtype is None:
+        edge_dtype = DEFAULT_INT
+    if weight_dtype is None:
+        weight_dtype = DEFAULT_FLOAT
+
     edge_array, community_memberships, weights = GenerateWeightedDirectedGraph(
         num_nodes, average_k, max_degree, mut, muw, com_size_min, com_size_max,
         seed, tau, tau2, overlapping_nodes, overlap_membership, fixed_range,
@@ -215,7 +227,7 @@ def unweighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mu,
                                     tau2=1.0, overlapping_nodes=0,
                                     overlap_membership=0, fixed_range=True,
                                     excess=False, defect=False, randomf=False,
-                                    avg_clustering=0.0, edge_dtype=DEFAULT_INT):
+                                    avg_clustering=0.0, edge_dtype=None):
     """
     Nodes start at 0 and are contiguous
     Return Ex2 numpy array and tuple of community memberships for each node
@@ -240,6 +252,10 @@ def unweighted_undirected_lfr_graph(num_nodes, average_k, max_degree, mu,
     :param edge_dtype: return type of edge list. Default: DEFAULT_INT
     :return: (Ex2 numpy array, tuple community memberships for each node)
     """
+
+    if edge_dtype is None:
+        edge_dtype = DEFAULT_INT
+
     edge_array, community_memberships = GenerateUnweightedUndirectedGraph(
         num_nodes, average_k, max_degree, mu, com_size_min, com_size_max, seed,
         tau, tau2, overlapping_nodes, overlap_membership, fixed_range, excess,
@@ -303,7 +319,7 @@ def unweighted_directed_lfr_graph(num_nodes, average_k, max_degree, mu,
                                   tau2=1.0, overlapping_nodes=0,
                                   overlap_membership=0, fixed_range=True,
                                   excess=False, defect=False, randomf=False,
-                                  edge_dtype=DEFAULT_INT):
+                                  edge_dtype=None):
     """
     Nodes start at 0 and are contiguous
     Return Ex2 numpy array and tuple of community memberships for each node
@@ -329,6 +345,10 @@ def unweighted_directed_lfr_graph(num_nodes, average_k, max_degree, mu,
      * Order of resulting Numpy array is: Ex2 with major axis as [0]=tail, [1]=head
      * Row major format, so [edge#][0]=tail, [edge#][1]=head
     """
+
+    if edge_dtype is None:
+        edge_dtype = DEFAULT_INT
+
     edge_array, community_memberships = GenerateUnweightedDirectedGraph(
         num_nodes, average_k, max_degree, mu, com_size_min, com_size_max, seed, 
         tau, tau2, overlapping_nodes, overlap_membership, fixed_range, excess, 
@@ -388,7 +408,7 @@ def unweighted_directed_lfr_as_adj(*args, **kwargs):
 
 
 def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights, transpose=False,
-                                     weight_dtype=DEFAULT_FLOAT):
+                                     weight_dtype=None):
     """
     :param edge_array: Ex2 numpy array
     :param num_nodes: N
@@ -399,7 +419,10 @@ def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights, transpose=F
     :return: dtype=np.float32 NxN matrix
     """
 
-    matrix = np.zeros((num_nodes, num_nodes), dtype=DEFAULT_FLOAT)
+    if weight_dtype is None:
+        weight_dtype = DEFAULT_FLOAT
+
+    matrix = np.zeros((num_nodes, num_nodes), dtype=weight_dtype)
     for i, edge in enumerate(edge_array):
         matrix[edge[0], edge[1]] = weights[i]
 
@@ -410,7 +433,7 @@ def convert_weighted_to_numpy_matrix(edge_array, num_nodes, weights, transpose=F
 
 
 def convert_unweighted_to_numpy_matrix(edge_array, num_nodes, transpose=False,
-                                       edge_dtype=DEFAULT_INT):
+                                       edge_dtype=None):
     """
     :param edge_array: Ex2 numpy array
     :param num_nodes: N
@@ -420,7 +443,10 @@ def convert_unweighted_to_numpy_matrix(edge_array, num_nodes, transpose=False,
     :return: dtype=np.uint64 NxN matrix
     """
 
-    matrix = np.zeros((num_nodes, num_nodes), dtype=DEFAULT_INT)
+    if edge_dtype is None:
+        edge_dtype = DEFAULT_INT
+
+    matrix = np.zeros((num_nodes, num_nodes), dtype=edge_dtype)
     for edge in edge_array:
         matrix[edge[0], edge[1]] = 1
 
