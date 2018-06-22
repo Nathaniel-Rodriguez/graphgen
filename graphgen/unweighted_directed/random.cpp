@@ -18,7 +18,7 @@
 #define R2_EPS 1.2e-7
 #define R2_RNMX (1.0-R2_EPS)
 
-
+#include <random>
 
 
 double ran2(long *idum) {
@@ -51,8 +51,12 @@ double ran2(long *idum) {
   iy=iv[j]-idum2;
   iv[j]=*idum;
   if(iy<1) iy+=R2_IMM1;
-  if((temp=R2_AM*iy)>R2_RNMX) return R2_RNMX;
-  else return temp;
+  if((temp=R2_AM*iy)>R2_RNMX) {
+    return R2_RNMX;
+  }
+  else {
+    return temp;
+  }
 }
 
 
@@ -74,21 +78,37 @@ double ran4(bool t, long s) {
 }
 
 
-double ran4() {
-  
-  return ran4(true, 0);
+double ran4_rng(bool t, std::uniform_real_distribution<double>* dist,
+                std::mt19937* rng) {
+  static std::uniform_real_distribution<double>* real0to1 = nullptr;
+  static std::mt19937* generator = nullptr;
+  if (t) {
+    return (*real0to1)(*generator);
+  }
+  else {
+    real0to1 = dist;
+    generator = rng;
+    return 0.0;
+  }
 }
 
+double ran4() {
+
+  return ran4_rng(true, nullptr, nullptr);
+}
+
+void set_rng(std::uniform_real_distribution<double> &dist, std::mt19937& rng) {
+  ran4_rng(false, &dist, &rng);
+}
 
 void srand4(void) {
-  
+
   long s=(long)time(NULL);
   ran4(false, s);
-  
-  
-  
-}
 
+
+
+}
 void srand5(int rank) {
   
   long s=(long)(rank);

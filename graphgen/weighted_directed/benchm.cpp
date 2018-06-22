@@ -30,7 +30,7 @@
 
 
 #include "dir_benchm.cpp"
-
+#include <random>
 
 int print_network(deque<set<int> > & Ein, deque<set<int> > & Eout, const deque<deque<int> > & member_list, const deque<deque<int> > & member_matrix, 
 	deque<int> & num_seq, deque<map <int, double > > & neigh_weigh_in, deque<map <int, double > > & neigh_weigh_out, double beta, double mu, double mu0) {
@@ -842,7 +842,9 @@ void build_network(int num_nodes, double average_k, int max_degree, double tau,
                    deque<deque<int> > &output_member_list,
                    deque<map <int, double > > &output_Wout) {
 
-  srand_seed(seed);
+	std::mt19937 rand(seed);
+	std::uniform_real_distribution<double> real0to1(0,1);
+	set_rng(real0to1, rand);
   Parameters p(num_nodes, average_k, max_degree, tau, tau2, mixing_parameter,
                mixing_parameter2, beta, overlapping_nodes, overlap_membership,
                nmin, nmax, fixed_range, excess, defect, randomf);

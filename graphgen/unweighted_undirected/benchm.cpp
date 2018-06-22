@@ -35,7 +35,7 @@
 #define unlikely -214741
 
 #include "set_parameters.cpp"
-
+#include <random>
 
 
 bool they_are_mate(int a, int b, const deque<deque<int> > & member_list) {
@@ -1760,7 +1760,9 @@ void build_network(int num_nodes, double average_k, int max_degree, double tau,
 									 deque<set<int> > &output_Eout,
 									 deque<deque<int> > &output_member_list) {
 
-	srand_seed(seed);
+	std::mt19937 rand(seed);
+	std::uniform_real_distribution<double> real0to1(0,1);
+	set_rng(real0to1, rand);
 	Parameters p(num_nodes, average_k, max_degree, tau, tau2, mixing_parameter,
 							 overlapping_nodes, overlap_membership, nmin, nmax, fixed_range,
 							 excess, defect, randomf, clustering_coeff);
