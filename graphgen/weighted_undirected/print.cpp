@@ -1,3 +1,8 @@
+/*
+ * Most code that follows is Andrea's. I have made minor modifications to it.
+ * TODO: Clean up and refactor code.
+ * Sorry for inconvenience, it was this way when I found it.
+ */
 #if !defined(PRINT_INCLUDED)
 #define PRINT_INCLUDED	
 	

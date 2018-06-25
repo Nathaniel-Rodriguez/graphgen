@@ -1,3 +1,9 @@
+/*
+ * Most code that follows is Andrea's. I have made minor modifications to it.
+ * TODO: Clean up and refactor code.
+ * Sorry for inconvenience, it was this way when I found it.
+ */
+
 
 #include "./standard_include.cpp"
 #define unlikely -214741
