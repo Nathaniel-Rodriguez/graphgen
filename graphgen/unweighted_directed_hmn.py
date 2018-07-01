@@ -36,10 +36,10 @@ def random_product_without_replacement(*args, **kwargs):
         rvs = []
         for _ in range(size):
             # rv = tuple(random.choice(pool) for pool in pools)
-            rv = tuple(random_state.choice(pools, k=len(pools)))
+            rv = tuple(random_state.choice(pool) for pool in pools)
             while rv in used:
                 # rv = tuple(random.choice(pool) for pool in pools)
-                rv = tuple(random_state.choice(pools, k=len(pools)))
+                rv = tuple(random_state.choice(pool) for pool in pools)
 
             rvs.append(rv)
             used.add(rv)
@@ -208,7 +208,8 @@ if __name__ == '__main__':
     print(N)
 
     # Generate initial node set
-    graph = unweighted_directed_hmn(s, b, M_o, p, alpha)
+    graph = unweighted_directed_hmn(s, b, M_o, p, alpha,
+                                    np.random.RandomState(3423))
     print(nx.info(graph))
 
     nx.write_gexf(graph,"test.gexf")
