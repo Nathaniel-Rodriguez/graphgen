@@ -82,7 +82,7 @@ def assign_community_memberships(graph, num_of_levels, node2membership_translato
 
     # Assign memberships
     for l in range(num_of_levels):
-        nx.set_node_attributes(graph, l, node2membership_translator[l])
+        nx.set_node_attributes(graph, name=l, values=node2membership_translator[l])
 
 
 def connect_base_layer(graph, membership2node_translator):
