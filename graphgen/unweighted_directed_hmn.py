@@ -151,9 +151,9 @@ def connect_upper_layers(graph, num_of_levels, communities_per_level,
                 graph.add_edges_from(random_edges_2to1)
 
 
-def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
-                            attachment_probability, connectivity_scaling,
-                            random_state):
+def unweighted_directed_hmn_as_nx(num_of_levels, communities_per_level,
+                                  base_com_size, attachment_probability,
+                                  connectivity_scaling, random_state):
     """
     Builds a hierarchical modular network using the aglorithm from:
     Moretti, P., & Munoz, M. A. (2013). Griffiths phases and the stretching of
@@ -190,7 +190,23 @@ def unweighted_directed_hmn(num_of_levels, communities_per_level, base_com_size,
 
 def unweighted_directed_hmn_as_asarray(**kwargs):
 
-    return np.asarray(nx.to_numpy_matrix(unweighted_directed_hmn(**kwargs)))
+    return np.asarray(nx.to_numpy_matrix(unweighted_directed_hmn_as_nx(**kwargs)))
+
+
+def unweighted_directed_hmn_as_edge_list(dtype=np.uint64, **kwargs):
+    """
+    :param dtype: numpy type of edge list, defaults: uint64
+    :param kwargs: arguments for unweighted_directed_hmn_as_nx
+    :return: (numpy array Ex2, number of nodes)
+    """
+
+    graph = unweighted_directed_hmn_as_nx(**kwargs)
+    edge_list = np.zeros((graph.number_of_edges(), 2), dtype=dtype)
+    for i, edge in enumerate(graph.edges()):
+        edge_list[i, 0] = edge[0]
+        edge_list[i, 1] = edge[1]
+
+    return edge_list, graph.number_of_nodes()
 
 
 if __name__ == '__main__':
