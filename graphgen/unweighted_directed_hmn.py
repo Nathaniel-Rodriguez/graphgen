@@ -224,7 +224,7 @@ if __name__ == '__main__':
     print(N)
 
     # Generate initial node set
-    graph = unweighted_directed_hmn(s, b, M_o, p, alpha,
+    graph = unweighted_directed_hmn_as_nx(s, b, M_o, p, alpha,
                                     np.random.RandomState(3423))
     print(nx.info(graph))
 
